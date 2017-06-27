@@ -25,7 +25,10 @@ public class UserController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String addUser(@ModelAttribute("user") User user) {
         if (user.getId() == null || user.getId() == 0) {
-            userService.addUser(user);
+            if (user.getName().length()>0&&user.getAge()>0) {
+                userService.addUser(user);
+            }
+            else return "redirect:/";
         } else {
             User usLost = userService.getUserById(user.getId());
             Date date= usLost.getCreatedDate();
@@ -36,14 +39,10 @@ public class UserController {
 
     @RequestMapping("/search/")
     public String search(@RequestParam("name") String name, Model model) {
-        if (userService.findUsers(name).size()!=0) {
             model.addAttribute("user", new User());
             model.addAttribute("users", userService.findUsers(name));
-         return "users";
-        }
-         else {
-            return "redirect:/";
-        }
+            return "users";
+
     }
 
     @RequestMapping("/remove/{id}")
