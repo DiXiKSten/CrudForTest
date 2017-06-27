@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -22,10 +23,11 @@ public class UserDaoImpl implements UserDao {
 
     @Transactional
     @Override
-    public void updateUser(User user) {
+    public void updateUser(User user, Date date) {
         if (user.getId() == null) {
             this.em.persist(user);
         } else {
+            user.setCreatedDate(date);
             this.em.merge(user);
         }
     }
@@ -52,15 +54,6 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<User> filteredUsers(String type) {
-        return em.createQuery(
-                "SELECT user FROM users user WHERE user.isAdmin = :done ORDER BY user.name")
-                .setParameter("done", type.equals("Admin"))
-                .getResultList();
-    }
-
-    @Override
     @Transactional
     public void fillUsers() {
         Random random = new Random();
@@ -72,5 +65,13 @@ public class UserDaoImpl implements UserDao {
             user.setAge((int) (Math.random()*50)+1);
             addUser(user);
         }
+    }
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> findUsers(String ids) {
+        return em.createQuery(
+                "SELECT user FROM users user WHERE user.name = :x")
+                .setParameter("x", ids)
+                .getResultList();
     }
 }

@@ -1,14 +1,13 @@
 package user.controller;
 
+import org.springframework.web.bind.annotation.*;
 import user.model.User;
 import user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.Date;
 
 @Controller
 public class UserController {
@@ -25,12 +24,26 @@ public class UserController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String addUser(@ModelAttribute("user") User user) {
-        if (user.getId() == null || user.getId() == 0L) {
+        if (user.getId() == null || user.getId() == 0) {
             userService.addUser(user);
         } else {
-            userService.updateUser(user);
+            User usLost = userService.getUserById(user.getId());
+            Date date= usLost.getCreatedDate();
+            userService.updateUser(user, date);
         }
         return "redirect:/";
+    }
+
+    @RequestMapping("/search/")
+    public String search(@RequestParam("name") String name, Model model) {
+        if (userService.findUsers(name).size()!=0) {
+            model.addAttribute("user", new User());
+            model.addAttribute("users", userService.findUsers(name));
+         return "users";
+        }
+         else {
+            return "redirect:/";
+        }
     }
 
     @RequestMapping("/remove/{id}")
@@ -50,14 +63,6 @@ public class UserController {
     @RequestMapping("/filter/edit/{id}")
     public String editInFilter(@PathVariable("id") Long id, Model model) {
         return editUser(id, model);
-    }
-
-    @RequestMapping("/filter/{type}")
-    public String filterUsers(@PathVariable("type") String type, Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("users", userService.filteredUsers(type));
-
-        return "users";
     }
 
     @RequestMapping("/fill")
