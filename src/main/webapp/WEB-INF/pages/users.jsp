@@ -154,11 +154,11 @@
         <br/>
         <c:if test="${user.id==0}">
             <br/>
-            <button type="submit" size="Small">Add User</button>
+            <button type="submit" class="button24" size="Small">Add User</button>
         </c:if>
         <c:if test="${!(user.id==0)}">
             <br/>
-            <button type="submit" size="Small">Edit User</button>
+            <button type="submit" class="button24" size="Small">Edit User</button>
         </c:if>
     </form:form>
 </div>
